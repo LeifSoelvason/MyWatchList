@@ -1,0 +1,67 @@
+﻿@page "/"
+@page "/movie/edit/{movieId:int}"
+@using Services
+@inject IMovieService movieService
+<PageTitle>@Title</PageTitle>
+
+<h3>@Title</h3>
+<a href="/movies" class="btn btn-outline-dark">Show All</a>
+<div class="row">
+    <div class="col-md-6">
+        <EditForm Model="@movie" OnValidSubmit="Save">
+            <DataAnnotationsValidator/>
+
+            <div class="form-group">
+                <label for="Title">Title</label>
+                <InputText class="form-control" @bind-Value="movie.Title"></InputText>
+                <ValidationMessage For="@(()=>movie.Title)"/>
+            </div>
+
+            <div class="form-group">
+                <label for="Title">Releasedate</label>
+                <InputDate class="form-control" @bind-Value="movie.ReleaseDate"></InputDate>
+                <ValidationMessage For="@(()=>movie.ReleaseDate)"/>
+            </div>
+          
+            <div class="my-2">
+                @message
+            </div>
+
+             <div class="my-2">
+                 <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int movieId { get; set; }
+    private string message = string.Empty;
+    Models.Movie movie = new();
+    private string Title = "Add Movie";
+    private void Save()
+    {
+        
+        if(movieService.AddUpdate(movie))
+        {
+            message = "Succesfully added";
+            movie = new();
+        }
+        else
+        {
+            message = "Save failed!";
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        if(movieId>0)
+        {
+            Title = "Update Movie";
+            movie = movieService.FindByid(movieId);
+        }
+        base.OnInitialized();   
+    }
+
+}
